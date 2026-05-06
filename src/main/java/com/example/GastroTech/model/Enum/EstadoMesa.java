@@ -1,4 +1,4 @@
-package com.example.GastroTech.model;
+package com.example.GastroTech.model.Enum;
 
 public enum EstadoMesa {
     DISPONIBLE,

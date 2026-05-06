@@ -1,5 +1,7 @@
-package com.example.GastroTech.model;
+package com.example.GastroTech.model.Entity;
 
+import com.example.GastroTech.model.Enum.EstadoMesa;
+import com.example.GastroTech.model.Enum.UbicacionMesa;
 import jakarta.persistence.*;
 
 @Entity

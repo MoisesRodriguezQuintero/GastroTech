@@ -1,5 +1,6 @@
-package com.example.GastroTech.model;
+package com.example.GastroTech.model.Entity;
 
+import com.example.GastroTech.model.Enum.RolUsuario;
 import jakarta.persistence.*;
 
 import java.util.Date;
