@@ -15,8 +15,8 @@ public class Mesa {
     private int Capacidad;
 
     @Enumerated(EnumType.STRING)
-    private String Ubicacion;
+    private UbicacionMesa Ubicacion;
 
     @Enumerated(EnumType.STRING)
-    private String Estado;
+    private EstadoMesa Estado;
 }

@@ -19,7 +19,7 @@ public class Usuario {
     private String Pass;
 
     @Enumerated(EnumType.STRING)
-    private String Rol;
+    private RolUsuario Rol;
 
     private Date Fecha_Creacion;
 

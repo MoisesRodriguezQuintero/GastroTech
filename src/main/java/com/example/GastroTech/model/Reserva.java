@@ -20,7 +20,7 @@ public class Reserva {
     private int num_personas;
 
     @Enumerated(EnumType.STRING)
-    private String Estado;
+    private EstadoReserva Estado;
 
     private Date Fecha_Creacion;
 
