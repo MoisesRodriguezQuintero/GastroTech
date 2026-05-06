@@ -22,7 +22,7 @@ public class Reserva {
     @Enumerated(EnumType.STRING)
     private String Estado;
 
-    private Date Fecha_Creación;
+    private Date Fecha_Creacion;
 
     private String Observaciones;
 
