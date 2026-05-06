@@ -32,7 +32,7 @@ public class Reserva {
     private Cliente paciente;
 
     @ManyToOne
-    @JoinColumn(name = "usuario_id", nullable = false)
+    @JoinColumn(name = "Usuario_id", nullable = false)
     private Usuario medico;
 
 }
