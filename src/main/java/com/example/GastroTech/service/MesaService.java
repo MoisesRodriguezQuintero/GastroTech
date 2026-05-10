@@ -1,31 +1,60 @@
 package com.example.GastroTech.service;
 
+import com.example.GastroTech.dto.request.MesaRequestDTO;
+import com.example.GastroTech.dto.response.MesaResponseDTO;
+import com.example.GastroTech.exception.ResourceNotFoundException;
 import com.example.GastroTech.model.Entity.Mesa;
 import com.example.GastroTech.model.Enum.EstadoMesa;
-import com.example.GastroTech.model.Enum.UbicacionMesa;
 import com.example.GastroTech.repository.MesaRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class MesaService {
+
     private final MesaRepository mesaRepository;
 
-    public MesaService(MesaRepository mesaRepository) {
-        this.mesaRepository = mesaRepository;
+    public List<MesaResponseDTO> findAllMesas() {
+        return mesaRepository.findAll().stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
     }
 
-    public List<Mesa> buscarMesasDisponibles(EstadoMesa estado){
-        return mesaRepository.findByEstado(estado);
-    }
-    public List<Mesa> buscarPorUbicacion(UbicacionMesa ubicacion){
-        return mesaRepository.findByUbicacion(ubicacion);
+    public MesaResponseDTO findMesaById(Long id) {
+        Mesa mesa = mesaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Mesa no encontrada con id: " + id));
+        return mapToResponseDTO(mesa);
     }
 
-    public List<Mesa> buscarPorCapacidad(int capacidad){
-        return mesaRepository.findByCapacidadGreaterThanEqual(capacidad);
+    public MesaResponseDTO createMesa(MesaRequestDTO dto) {
+        Mesa mesa = Mesa.builder()
+                .numeroMesa(dto.numeroMesa())
+                .capacidad(dto.capacidad())
+                .ubicacion(dto.ubicacion())
+                .estado(EstadoMesa.DISPONIBLE)
+                .build();
+        return mapToResponseDTO(mesaRepository.save(mesa));
+    }
+
+    public List<MesaResponseDTO> findMesasDisponibles() {
+        return mesaRepository.findByEstado(EstadoMesa.DISPONIBLE).stream()
+                .map(this::mapToResponseDTO)
+                .collect(Collectors.toList());
+    }
+
+    // ─── Mapeo entidad → DTO (las entidades nunca salen del Service) ─────────
+
+    private MesaResponseDTO mapToResponseDTO(Mesa mesa) {
+        return new MesaResponseDTO(
+                mesa.getId(),
+                mesa.getNumeroMesa(),
+                mesa.getCapacidad(),
+                mesa.getUbicacion().name(),
+                mesa.getEstado().name()
+        );
     }
 }

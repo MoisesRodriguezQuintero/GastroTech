@@ -3,22 +3,32 @@ package com.example.GastroTech.model.Entity;
 import com.example.GastroTech.model.Enum.EstadoMesa;
 import com.example.GastroTech.model.Enum.UbicacionMesa;
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
-@Table(name="Mesa")
+@Table(name = "mesa")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Mesa {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long Id;
+    private Long id;
 
-    private int Numero_Mesa;
+    @Column(nullable = false, unique = true)
+    private int numeroMesa;
 
-    private int Capacidad;
+    @Column(nullable = false)
+    private int capacidad;
 
     @Enumerated(EnumType.STRING)
-    private UbicacionMesa Ubicacion;
+    @Column(nullable = false)
+    private UbicacionMesa ubicacion;
 
     @Enumerated(EnumType.STRING)
-    private EstadoMesa Estado;
+    @Column(nullable = false)
+    private EstadoMesa estado;
 }

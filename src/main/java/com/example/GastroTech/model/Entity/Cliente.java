@@ -1,26 +1,34 @@
 package com.example.GastroTech.model.Entity;
 
 import jakarta.persistence.*;
+import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name="Cliente")
+@Table(name = "cliente")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Cliente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long Id;
+    private Long id;
 
-    private String Nombre;
+    @Column(nullable = false)
+    private String nombre;
 
-    private String Apellidos;
+    private String apellidos;
 
-    private String Email;
+    @Column(unique = true)
+    private String email;
 
-    private int telefono;
+    private String telefono;
 
-    private Date Fecha_Registro;
+    private LocalDateTime fechaRegistro;
 
     private boolean activo;
 }

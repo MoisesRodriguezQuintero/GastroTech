@@ -2,37 +2,42 @@ package com.example.GastroTech.model.Entity;
 
 import com.example.GastroTech.model.Enum.EstadoReserva;
 import jakarta.persistence.*;
+import lombok.*;
 
-import java.time.LocalTime;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name="Reserva")
+@Table(name = "reserva")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Reserva {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long Id;
+    private Long id;
 
-    private Date Fecha;
+    @Column(nullable = false)
+    private LocalDateTime fechaReserva;
 
-    private LocalTime Hora_inicio;
-
-    private int num_personas;
+    @Column(nullable = false)
+    private int numeroPersonas;
 
     @Enumerated(EnumType.STRING)
-    private EstadoReserva Estado;
+    @Column(nullable = false)
+    private EstadoReserva estado;
 
-    private Date Fecha_Creacion;
+    private LocalDateTime fechaCreacion;
 
-    private String Observaciones;
+    private String observaciones;
 
-    @ManyToOne
-    @JoinColumn(name = "Cliente_id", nullable = false)
-    private Cliente paciente;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mesa_id", nullable = false)
+    private Mesa mesa;
 
-    @ManyToOne
-    @JoinColumn(name = "Usuario_id", nullable = false)
-    private Usuario medico;
-
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_id", nullable = false)
+    private Usuario usuario;
 }

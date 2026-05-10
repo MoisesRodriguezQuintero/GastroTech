@@ -12,6 +12,8 @@ import java.util.List;
 public interface MesaRepository extends JpaRepository<Mesa, Long> {
 
     List<Mesa> findByCapacidadGreaterThanEqual(int capacidad);
+
     List<Mesa> findByEstado(EstadoMesa estado);
+
     List<Mesa> findByUbicacion(UbicacionMesa ubicacion);
 }

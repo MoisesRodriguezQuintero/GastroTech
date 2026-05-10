@@ -1,26 +1,30 @@
 package com.example.GastroTech.repository;
 
-import com.example.GastroTech.model.Entity.Cliente;
-import com.example.GastroTech.model.Entity.Mesa;
 import com.example.GastroTech.model.Entity.Reserva;
 import com.example.GastroTech.model.Enum.EstadoReserva;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
-public interface ReservaRepository extends JpaRepository<Reserva,Long> {
+public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
-    List<Reserva> findByFecha(LocalDate fecha);
+    /** Todas las reservas de un usuario concreto. */
+    List<Reserva> findByUsuarioId(Long usuarioId);
 
-    List<Reserva> findByMesaAndFecha(
-            Mesa mesa,
-            LocalDate fecha
-    );
-
-    List<Reserva> findByClienteId(Long cliente);
-
+    /** Reservas en un estado determinado. */
     List<Reserva> findByEstado(EstadoReserva estado);
+
+    /**
+     * Comprueba si ya existe una reserva NO cancelada para una mesa
+     * dentro de una franja de ±2 horas.
+     */
+    boolean existsByMesaIdAndFechaReservaBetweenAndEstadoNot(
+            Long mesaId,
+            LocalDateTime inicio,
+            LocalDateTime fin,
+            EstadoReserva estado
+    );
 }
