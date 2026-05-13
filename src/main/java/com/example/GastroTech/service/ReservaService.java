@@ -81,7 +81,12 @@ public class ReservaService {
      * Devuelve reservas segun el rol:
      * - ADMIN: todas las reservas.
      * - USER: solo las propias.
+     *
+     * NOTA: @Transactional es obligatorio aqui porque mapToResponseDTO accede a
+     * relaciones LAZY (mesa, usuario). Sin transaccion activa, Hibernate cierra la
+     * sesion tras el findAll/findByUsuarioId y lanza LazyInitializationException.
      */
+    @Transactional(readOnly = true)
     public List<ReservationResponseDTO> findReservations(String username) {
         Usuario usuario = usuarioRepository.findByEmail(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));

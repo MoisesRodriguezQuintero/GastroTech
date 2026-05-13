@@ -48,7 +48,6 @@ public class Usuario implements UserDetails {
         return List.of(new SimpleGrantedAuthority("ROLE_" + rol.name()));
     }
 
-    /** El email actúa como nombre de usuario para Spring Security. */
     @Override
     public String getUsername() {
         return email;
