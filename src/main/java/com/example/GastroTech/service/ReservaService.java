@@ -82,6 +82,7 @@ public class ReservaService {
                 .fechaCreacion(LocalDateTime.now())
                 .build();
 
+        // valida si el usuario es habitual
         if (usuarioIsVip(usuario, mesa));
 
         return mapToResponseDTO(reservaRepository.save(reserva));
@@ -157,6 +158,7 @@ public class ReservaService {
 
     // ─── Crear Usuario Vip ─────────────────────────────────────────────────
     private boolean usuarioIsVip(Usuario usuario, Mesa mesa){
+
         List<Reserva> users = reservaRepository.findByUsuarioId(usuario.getId());
         if (users.size() <3 && mesa.isVip()){
             throw new BusinessException(

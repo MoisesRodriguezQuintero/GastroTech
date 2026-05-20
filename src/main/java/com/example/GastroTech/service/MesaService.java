@@ -44,15 +44,18 @@ public class MesaService {
         return mapToResponseDTO(mesaRepository.save(mesa));
     }
 
-    public List<MesaResponseDTO> findMesasDisponibles(MesaRequestDTO mesa, int capacidad) {
-        if (capacidad > mesa.capacidad()){
+    public List<MesaResponseDTO> findMesasDisponibles(MesaRequestDTO mesa, int comensales) {
+        //throw error si la capacidad es menos que la candidad de comensales
+        if (comensales > mesa.capacidad()){
             throw new BusinessException(
                     "Cantidad de comensales superior a la capacidad de la mesa"
             );
         }
-        return mesaRepository.findByEstado(EstadoMesa.DISPONIBLE).stream()
-                .map(this::mapToResponseDTO)
-                .collect(Collectors.toList());
+        //crear lista
+        List<MesaResponseDTO> capacidadList = mesaRepository.findByCapacidadGreaterThanEqual(comensales);
+        capacidadList.add(mesaRepository.findByEstado(EstadoMesa.DISPONIBLE));
+
+        return capacidadList;
     }
 
     // ─── Mapeo entidad → DTO (las entidades nunca salen del Service) ─────────

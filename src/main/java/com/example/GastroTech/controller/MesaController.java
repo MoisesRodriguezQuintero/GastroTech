@@ -24,21 +24,21 @@ public class MesaController {
 
     private final MesaService mesaService;
 
-    @GetMapping
+    @GetMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Listar todas las mesas")
     public ResponseEntity<List<MesaResponseDTO>> getAllMesas() {
         return ResponseEntity.ok(mesaService.findAllMesas());
     }
 
-    @PostMapping
+    @PostMapping("/create")
     @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Crear una nueva mesa")
     public ResponseEntity<MesaResponseDTO> createMesa(@Valid @RequestBody MesaRequestDTO dto) {
         return new ResponseEntity<>(mesaService.createMesa(dto), HttpStatus.CREATED);
     }
 
-    @GetMapping("api/v1/tables/available?guests=x")
+    @GetMapping("/available?guests=X")
     public List<MesaResponseDTO> getDisponibles(@RequestBody MesaRequestDTO dto, int guests){
         return mesaService.findMesasDisponibles(dto, guests);
     }

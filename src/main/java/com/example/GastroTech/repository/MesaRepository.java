@@ -1,5 +1,6 @@
 package com.example.GastroTech.repository;
 
+import com.example.GastroTech.dto.response.MesaResponseDTO;
 import com.example.GastroTech.model.Entity.Mesa;
 import com.example.GastroTech.model.Enum.EstadoMesa;
 import com.example.GastroTech.model.Enum.UbicacionMesa;
@@ -11,9 +12,9 @@ import java.util.List;
 @Repository
 public interface MesaRepository extends JpaRepository<Mesa, Long> {
 
-    List<Mesa> findByCapacidadGreaterThanEqual(int capacidad);
+    List<MesaResponseDTO> findByCapacidadGreaterThanEqual(int capacidad);
 
-    List<Mesa> findByEstado(EstadoMesa estado);
+    MesaResponseDTO findByEstado(EstadoMesa estado);
 
     List<Mesa> findByUbicacion(UbicacionMesa ubicacion);
 }

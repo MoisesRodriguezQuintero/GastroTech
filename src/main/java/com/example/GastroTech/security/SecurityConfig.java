@@ -54,6 +54,7 @@ public class SecurityConfig {
                         // Solo ADMIN puede gestionar mesas
                         .requestMatchers(HttpMethod.GET, "/api/v1/tables/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/v1/tables/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/tables/suggest").permitAll()
                         // El resto requiere autenticacion
                         .anyRequest().authenticated()
                 )
