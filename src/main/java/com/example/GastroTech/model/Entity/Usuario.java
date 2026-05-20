@@ -1,5 +1,6 @@
 package com.example.GastroTech.model.Entity;
 
+import com.example.GastroTech.model.Enum.EstadoUsuario;
 import com.example.GastroTech.model.Enum.RolUsuario;
 import jakarta.persistence.*;
 import lombok.*;
@@ -41,6 +42,15 @@ public class Usuario implements UserDetails {
 
     private boolean activo;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private int penalizationPoints = 0;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private EstadoUsuario status = EstadoUsuario.ACTIVE;
+
     // ── UserDetails ──────────────────────────────────────────────────────────
 
     @Override
@@ -48,7 +58,6 @@ public class Usuario implements UserDetails {
         return List.of(new SimpleGrantedAuthority("ROLE_" + rol.name()));
     }
 
-    /** El email actúa como nombre de usuario para Spring Security. */
     @Override
     public String getUsername() {
         return email;

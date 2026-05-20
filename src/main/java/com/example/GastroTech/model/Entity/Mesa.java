@@ -31,4 +31,6 @@ public class Mesa {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EstadoMesa estado;
+
+    private boolean isVip;
 }

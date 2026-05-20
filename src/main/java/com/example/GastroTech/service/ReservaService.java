@@ -4,10 +4,12 @@ import com.example.GastroTech.dto.request.ReservationRequestDTO;
 import com.example.GastroTech.dto.response.ReservationResponseDTO;
 import com.example.GastroTech.exception.BusinessException;
 import com.example.GastroTech.exception.ResourceNotFoundException;
+import com.example.GastroTech.exception.UserBannedException;
 import com.example.GastroTech.model.Entity.Mesa;
 import com.example.GastroTech.model.Entity.Reserva;
 import com.example.GastroTech.model.Entity.Usuario;
 import com.example.GastroTech.model.Enum.EstadoReserva;
+import com.example.GastroTech.model.Enum.EstadoUsuario;
 import com.example.GastroTech.model.Enum.RolUsuario;
 import com.example.GastroTech.repository.MesaRepository;
 import com.example.GastroTech.repository.ReservaRepository;
@@ -36,8 +38,16 @@ public class ReservaService {
     @Transactional
     public ReservationResponseDTO saveReservation(ReservationRequestDTO dto, String username) {
 
-        // Validacion de negocio: fecha futura (la anotacion @Future del DTO protege
-        // el endpoint REST, pero el Service tambien lo comprueba para ser testeable unitariamente)
+        // ── NUEVO: bloquear si el usuario está baneado ───────────────────────
+        Usuario usuario = usuarioRepository.findByEmail(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + username));
+
+        if (usuario.getStatus() == EstadoUsuario.BANNED) {
+            throw new UserBannedException();
+        }
+        // ─────────────────────────────────────────────────────────────────────
+
+        // Validacion de negocio: fecha futura
         if (!dto.reservationDate().isAfter(LocalDateTime.now())) {
             throw new BusinessException("La reserva debe ser en una fecha futura");
         }
@@ -60,10 +70,6 @@ public class ReservaService {
                     "La mesa ya tiene una reserva activa en esa franja horaria (margen de 2 horas)");
         }
 
-        // Buscar el usuario autenticado
-        Usuario usuario = usuarioRepository.findByEmail(username)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + username));
-
         // Construir y guardar la reserva
         Reserva reserva = Reserva.builder()
                 .mesa(mesa)
@@ -73,7 +79,11 @@ public class ReservaService {
                 .estado(EstadoReserva.PENDIENTE)
                 .fechaCreacion(LocalDateTime.now())
                 .build();
-
+        if (!usuarioIsVip(usuario,mesa)){
+            throw new BusinessException(
+                    "Esta mesa es solo para clientes Vip"
+            );
+        }
         return mapToResponseDTO(reservaRepository.save(reserva));
     }
 
@@ -81,7 +91,12 @@ public class ReservaService {
      * Devuelve reservas segun el rol:
      * - ADMIN: todas las reservas.
      * - USER: solo las propias.
+     *
+     * NOTA: @Transactional es obligatorio aqui porque mapToResponseDTO accede a
+     * relaciones LAZY (mesa, usuario). Sin transaccion activa, Hibernate cierra la
+     * sesion tras el findAll/findByUsuarioId y lanza LazyInitializationException.
      */
+    @Transactional(readOnly = true)
     public List<ReservationResponseDTO> findReservations(String username) {
         Usuario usuario = usuarioRepository.findByEmail(username)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
@@ -114,8 +129,39 @@ public class ReservaService {
             throw new BusinessException("No tienes permiso para cancelar esta reserva");
         }
 
+        // ── NUEVO: penalización por cancelación tardía ───────────────────────
+        // Solo se penaliza al usuario propietario (no al admin que cancela por él)
+        if (esPropietario) {
+            aplicarPenalizacionSiEsTardia(reserva, usuario);
+        }
+
         reserva.setEstado(EstadoReserva.CANCELADA);
         reservaRepository.save(reserva);
+    }
+
+    // ── NUEVO método privado de apoyo ────────────────────────────────────────────
+    private void aplicarPenalizacionSiEsTardia(Reserva reserva, Usuario usuario) {
+        LocalDateTime limite = reserva.getFechaReserva().minusHours(2);
+
+        if (LocalDateTime.now().isAfter(limite)) {
+            int nuevosPuntos = usuario.getPenalizationPoints() + 2;
+            usuario.setPenalizationPoints(nuevosPuntos);
+
+            if (nuevosPuntos > 6) {
+                usuario.setStatus(EstadoUsuario.BANNED);
+            }
+
+            usuarioRepository.save(usuario);
+        }
+    }
+
+    // ─── Crear Usuario Vip ─────────────────────────────────────────────────
+    private boolean usuarioIsVip(Usuario usuario, Mesa mesa){
+        List<Reserva> users = reservaRepository.findByUsuarioId(usuario.getId());
+        if (users.size() <3 && mesa.isVip){
+            return false;
+        }
+        return true;
     }
 
     // ─── Mapeo entidad → DTO ─────────────────────────────────────────────────

@@ -57,4 +57,11 @@ public class GlobalExceptionHandler {
                 new ErrorResponse("INTERNAL_ERROR", "Error interno del servidor", LocalDateTime.now()),
                 HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    @ExceptionHandler(UserBannedException.class)
+    public ResponseEntity<ErrorResponse> handleUserBanned(UserBannedException ex) {
+        return new ResponseEntity<>(
+                new ErrorResponse("USER_BANNED", ex.getMessage(), LocalDateTime.now()),
+                HttpStatus.UNPROCESSABLE_ENTITY);   // 422
+    }
 }
