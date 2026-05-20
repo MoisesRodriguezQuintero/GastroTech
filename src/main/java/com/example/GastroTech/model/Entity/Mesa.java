@@ -32,5 +32,5 @@ public class Mesa {
     @Column(nullable = false)
     private EstadoMesa estado;
 
-    private boolean isVip;
+    private boolean vip;
 }

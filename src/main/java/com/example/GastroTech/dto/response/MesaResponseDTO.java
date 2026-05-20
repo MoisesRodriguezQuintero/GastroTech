@@ -5,5 +5,6 @@ public record MesaResponseDTO(
         int numeroMesa,
         int capacidad,
         String ubicacion,
-        String estado
+        String estado,
+        boolean vip
 ) {}

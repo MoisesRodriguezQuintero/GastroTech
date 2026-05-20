@@ -37,4 +37,9 @@ public class MesaController {
     public ResponseEntity<MesaResponseDTO> createMesa(@Valid @RequestBody MesaRequestDTO dto) {
         return new ResponseEntity<>(mesaService.createMesa(dto), HttpStatus.CREATED);
     }
+
+    @GetMapping("api/v1/tables/available?guests=x")
+    public List<MesaResponseDTO> getDisponibles(@RequestBody MesaRequestDTO dto, int guests){
+        return mesaService.findMesasDisponibles(dto, guests);
+    }
 }

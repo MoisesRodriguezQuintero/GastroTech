@@ -2,10 +2,13 @@ package com.example.GastroTech.service;
 
 import com.example.GastroTech.dto.request.MesaRequestDTO;
 import com.example.GastroTech.dto.response.MesaResponseDTO;
+import com.example.GastroTech.exception.BusinessException;
 import com.example.GastroTech.exception.ResourceNotFoundException;
 import com.example.GastroTech.model.Entity.Mesa;
 import com.example.GastroTech.model.Enum.EstadoMesa;
 import com.example.GastroTech.repository.MesaRepository;
+import com.example.GastroTech.repository.ReservaRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +19,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MesaService {
 
+    private final ReservaRepository reservaRepository;
     private final MesaRepository mesaRepository;
 
     public List<MesaResponseDTO> findAllMesas() {
@@ -40,7 +44,12 @@ public class MesaService {
         return mapToResponseDTO(mesaRepository.save(mesa));
     }
 
-    public List<MesaResponseDTO> findMesasDisponibles() {
+    public List<MesaResponseDTO> findMesasDisponibles(MesaRequestDTO mesa, int capacidad) {
+        if (capacidad > mesa.capacidad()){
+            throw new BusinessException(
+                    "Cantidad de comensales superior a la capacidad de la mesa"
+            );
+        }
         return mesaRepository.findByEstado(EstadoMesa.DISPONIBLE).stream()
                 .map(this::mapToResponseDTO)
                 .collect(Collectors.toList());
@@ -54,7 +63,8 @@ public class MesaService {
                 mesa.getNumeroMesa(),
                 mesa.getCapacidad(),
                 mesa.getUbicacion().name(),
-                mesa.getEstado().name()
+                mesa.getEstado().name(),
+                mesa.isVip()
         );
     }
 }

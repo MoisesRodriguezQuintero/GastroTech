@@ -1,7 +1,9 @@
 package com.example.GastroTech.service;
 
 import com.example.GastroTech.dto.request.ReservationRequestDTO;
+import com.example.GastroTech.dto.response.MesaResponseDTO;
 import com.example.GastroTech.dto.response.ReservationResponseDTO;
+import com.example.GastroTech.dto.response.UsuarioResponseDTO;
 import com.example.GastroTech.exception.BusinessException;
 import com.example.GastroTech.exception.ResourceNotFoundException;
 import com.example.GastroTech.exception.UserBannedException;
@@ -79,11 +81,9 @@ public class ReservaService {
                 .estado(EstadoReserva.PENDIENTE)
                 .fechaCreacion(LocalDateTime.now())
                 .build();
-        if (!usuarioIsVip(usuario,mesa)){
-            throw new BusinessException(
-                    "Esta mesa es solo para clientes Vip"
-            );
-        }
+
+        if (usuarioIsVip(usuario, mesa));
+
         return mapToResponseDTO(reservaRepository.save(reserva));
     }
 
@@ -158,10 +158,14 @@ public class ReservaService {
     // ─── Crear Usuario Vip ─────────────────────────────────────────────────
     private boolean usuarioIsVip(Usuario usuario, Mesa mesa){
         List<Reserva> users = reservaRepository.findByUsuarioId(usuario.getId());
-        if (users.size() <3 && mesa.isVip){
-            return false;
+        if (users.size() <3 && mesa.isVip()){
+            throw new BusinessException(
+                    "Solo clientes habituales pueden reservar mesas VIP"
+            );
         }
-        return true;
+        else {
+            return true;
+        }
     }
 
     // ─── Mapeo entidad → DTO ─────────────────────────────────────────────────
