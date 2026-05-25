@@ -16,6 +16,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
 
     /** Reservas en un estado determinado. */
     List<Reserva> findByEstado(EstadoReserva estado);
+    /** Reservas de un usuario concreto en un estado determinado. */
+    List<Reserva> findByUsuarioIdAndEstado(Long usuarioId, EstadoReserva estado);
 
     /**
      * Comprueba si ya existe una reserva NO cancelada para una mesa

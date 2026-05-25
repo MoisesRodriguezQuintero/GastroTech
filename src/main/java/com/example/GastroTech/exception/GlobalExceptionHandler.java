@@ -64,4 +64,11 @@ public class GlobalExceptionHandler {
                 new ErrorResponse("USER_BANNED", ex.getMessage(), LocalDateTime.now()),
                 HttpStatus.UNPROCESSABLE_ENTITY);   // 422
     }
+
+    @ExceptionHandler(VipAccessException.class)
+    public ResponseEntity<ErrorResponse> handleVip(VipAccessException ex) {
+        return new ResponseEntity<>(
+                new ErrorResponse("VIP_ACCESS_DENIED", ex.getMessage(), LocalDateTime.now()),
+                HttpStatus.FORBIDDEN);   // 403
+    }
 }

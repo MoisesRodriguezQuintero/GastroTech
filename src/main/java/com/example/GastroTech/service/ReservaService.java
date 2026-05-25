@@ -59,6 +59,11 @@ public class ReservaService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Mesa no encontrada con id: " + dto.tableId()));
 
+        if (dto.numberOfGuests() > mesa.getCapacidad()) {
+            throw new BusinessException(
+                    "El numero de comensales (" + dto.numberOfGuests() +
+                            ") supera la capacidad de la mesa (" + mesa.getCapacidad() + ")");
+        }
         // Comprobar franja de 2 horas
         LocalDateTime inicio = dto.reservationDate().minusHours(2);
         LocalDateTime fin    = dto.reservationDate().plusHours(2);
@@ -159,11 +164,10 @@ public class ReservaService {
     // ─── Crear Usuario Vip ─────────────────────────────────────────────────
     private boolean usuarioIsVip(Usuario usuario, Mesa mesa){
 
-        List<Reserva> users = reservaRepository.findByUsuarioId(usuario.getId());
+        List<Reserva> users = reservaRepository.findByUsuarioIdAndEstado(
+                usuario.getId(), EstadoReserva.COMPLETADA);
         if (users.size() <3 && mesa.isVip()){
-            throw new BusinessException(
-                    "Solo clientes habituales pueden reservar mesas VIP"
-            );
+            throw new VipAccessException();
         }
         else {
             return true;
